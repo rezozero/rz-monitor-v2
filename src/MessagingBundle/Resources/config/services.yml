@@ -1,0 +1,14 @@
+services:
+    messaging.say_hello_service:
+        class: MessagingBundle\Consumer\SayHelloConsumer
+        #arguments: ["@service_id", "plain_value", %parameter%]
+    messaging.crawl_website_service:
+        class: MessagingBundle\Consumer\CrawlWebsiteConsumer
+        calls:
+            - [ setContainer, [ @service_container ] ]
+        #arguments: ["@service_id", "plain_value", %parameter%]
+    messaging.notify_website_service:
+        class: MessagingBundle\Consumer\NotifyWebsiteConsumer
+        calls:
+            - [ setContainer, [ @service_container ] ]
+        #arguments: ["@service_id", "plain_value", %parameter%]

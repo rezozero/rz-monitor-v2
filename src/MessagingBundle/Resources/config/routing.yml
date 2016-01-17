@@ -1,0 +1,9 @@
+messaging_homepage:
+    path:     /test-rabbitmq
+    defaults: { _controller: MessagingBundle:Default:index }
+messaging_test_crawl:
+    path:     /test-crawl
+    defaults: { _controller: MessagingBundle:Default:testCrawl }
+messaging_test_crawl_fail:
+    path:     /test-crawl-fail
+    defaults: { _controller: MessagingBundle:Default:testCrawlFail }
