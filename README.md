@@ -1,4 +1,7 @@
 rz-monitor-v2
 =============
 
-A Symfony project created on January 17, 2016, 12:23 pm.
+## Consumers
+
+* `php app/console rabbitmq:consumer -w notify_website` 
+* `php app/console rabbitmq:consumer -w crawl_website` 

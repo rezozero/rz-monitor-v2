@@ -25,18 +25,18 @@
  */
 namespace MessagingBundle\Consumer;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use MessagingBundle\Message\WebsiteMessage;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
-use MessagingBundle\Message\WebsiteMessage;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use WebsiteBundle\Entity\Website;
 
 /**
  * NotifyWebsiteConsumer.
  */
-class NotifyWebsiteConsumer extends ContainerAware implements ConsumerInterface
+class NotifyWebsiteConsumer implements ConsumerInterface
 {
+    use ContainerAwareTrait;
     /**
      *  Main execute method
      *  Execute actions for a given message
@@ -47,13 +47,56 @@ class NotifyWebsiteConsumer extends ContainerAware implements ConsumerInterface
      */
     public function execute(AMQPMessage $msg)
     {
-        // Initialize
-        $website = new WebsiteMessage($msg->body);
+        $logger = $this->container->get('logger');
+        $em = $this->container->get('doctrine')->getManager();
+        $message = new WebsiteMessage($msg->body);
+        $websiteEntity = $em->getRepository('WebsiteBundle\Entity\Website')
+            ->findOneWithMessage($message);
 
-        if ($website->isUp()) {
-            echo "website: " . $website->getUrl() . " is up." . PHP_EOL;
+        if (null === $websiteEntity) {
+            throw new \RuntimeException("Website does not exists in database.", 1);
         } else {
-            echo "website: " . $website->getUrl() . " is down." . PHP_EOL;
+            if ($websiteEntity->getStatus() === $message->getStatus()) {
+                $websiteEntity->setCrawlCount($websiteEntity->getCrawlCount() + 1);
+                /*
+                 * Need to be declared failed twice to be broken.
+                 */
+                if ($message->getStatus() === Website::STATUS_FAIL &&
+                    $websiteEntity->getCrawlCount() > 2) {
+                    $websiteEntity->setStatus(Website::STATUS_BROKEN);
+                } else {
+                    $websiteEntity->setStatus($message->getStatus());
+                }
+            } else {
+                /*
+                 * If website is broken and crawling still failing.
+                 * Still broken.
+                 */
+                if ($message->getStatus() === Website::STATUS_FAIL &&
+                    $websiteEntity->getStatus() === Website::STATUS_BROKEN) {
+                    $websiteEntity->setStatus(Website::STATUS_BROKEN);
+                } else {
+                    /*
+                     * Reset crawl count when status changes.
+                     */
+                    $websiteEntity->setStatus($message->getStatus());
+                    $websiteEntity->setCrawlCount(1);
+                    $websiteEntity->setAvgResponseTime(0);
+                }
+            }
+
+            $websiteEntity->setLastResponseTime($message->getResponseTime());
+            $websiteEntity->setLastCrawl(new \Datetime('now'));
+            $websiteEntity->setHttpCode($message->getHttpCode());
+            $websiteEntity->setGenerator($message->getGenerator());
+
+            $em->flush();
+        }
+
+        if ($message->isUp()) {
+            $logger->info("[website] " . $message->getUrl() . " is up.");
+        } else {
+            $logger->info("[website] " . $message->getUrl() . " (" . $message->getFailMessage() . ") is down.");
         }
 
         return true;

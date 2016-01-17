@@ -18,6 +18,7 @@ class AppKernel extends Kernel
             new AppBundle\AppBundle(),
             new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
             new MessagingBundle\MessagingBundle(),
+            new WebsiteBundle\WebsiteBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {

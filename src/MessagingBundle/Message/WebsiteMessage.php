@@ -25,25 +25,37 @@
  */
 namespace MessagingBundle\Message;
 
+use WebsiteBundle\Entity\Website;
+
 /**
  * WebsiteMessage.
  */
 class WebsiteMessage
 {
-    const STATUS_OK = 10;
-    const STATUS_FAIL = 20;
-    const STATUS_BROKEN = 30;
-
+    protected $id;
+    protected $name;
     protected $url;
-    protected $status = self::STATUS_OK;
+    protected $status = Website::STATUS_OK;
+    protected $generator;
+    protected $responseTime;
+    protected $httpCode;
+    protected $failMessage;
 
+    /**
+     * @param string $json
+     */
     public function __construct($json = '')
     {
         if (is_string($json) && $json != '') {
             $body = json_decode($json, true);
+            $has = get_object_vars($this);
+            $fields = array_keys($has);
 
-            $this->setUrl($body['url']);
-            $this->setStatus($body['status']);
+            foreach ($body as $name => $value) {
+                if (in_array($name, $fields)) {
+                    $this->$name = $value;
+                }
+            }
         }
     }
 
@@ -73,10 +85,7 @@ class WebsiteMessage
 
     public function __toString()
     {
-        return json_encode(array(
-            'url' => $this->url,
-            'status' => $this->status,
-        ));
+        return json_encode(get_object_vars($this));
     }
 
     /**
@@ -105,6 +114,150 @@ class WebsiteMessage
 
     public function isUp()
     {
-        return $this->status === self::STATUS_OK;
+        return $this->status === Website::STATUS_OK;
+    }
+
+    /**
+     * Gets the value of id.
+     *
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Sets the value of id.
+     *
+     * @param mixed $id the id
+     *
+     * @return self
+     */
+    public function setId($id)
+    {
+        $this->id = (int) $id;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of name.
+     *
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Sets the value of name.
+     *
+     * @param mixed $name the name
+     *
+     * @return self
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of generator.
+     *
+     * @return mixed
+     */
+    public function getGenerator()
+    {
+        return $this->generator;
+    }
+
+    /**
+     * Sets the value of generator.
+     *
+     * @param mixed $generator the generator
+     *
+     * @return self
+     */
+    public function setGenerator($generator)
+    {
+        $this->generator = $generator;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of responseTime.
+     *
+     * @return mixed
+     */
+    public function getResponseTime()
+    {
+        return $this->responseTime;
+    }
+
+    /**
+     * Sets the value of responseTime.
+     *
+     * @param mixed $responseTime the response time
+     *
+     * @return self
+     */
+    public function setResponseTime($responseTime)
+    {
+        $this->responseTime = $responseTime;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of httpCode.
+     *
+     * @return mixed
+     */
+    public function getHttpCode()
+    {
+        return $this->httpCode;
+    }
+
+    /**
+     * Sets the value of httpCode.
+     *
+     * @param mixed $httpCode the http code
+     *
+     * @return self
+     */
+    public function setHttpCode($httpCode)
+    {
+        $this->httpCode = $httpCode;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of failMessage.
+     *
+     * @return mixed
+     */
+    public function getFailMessage()
+    {
+        return $this->failMessage;
+    }
+
+    /**
+     * Sets the value of failMessage.
+     *
+     * @param mixed $failMessage the fail message
+     *
+     * @return self
+     */
+    public function setFailMessage($failMessage)
+    {
+        $this->failMessage = $failMessage;
+
+        return $this;
     }
 }

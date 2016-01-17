@@ -1,3 +1,11 @@
+website_website:
+    resource: "@WebsiteBundle/Controller/WebsiteController.php"
+    type:     annotation
+
+website:
+    resource: "@WebsiteBundle/Resources/config/routing.yml"
+    prefix:   /
+
 messaging:
     resource: "@MessagingBundle/Resources/config/routing.yml"
     prefix:   /

@@ -27,22 +27,32 @@ namespace MessagingBundle\Consumer;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use MessagingBundle\Message\WebsiteMessage;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
-use MessagingBundle\Message\WebsiteMessage;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use WebsiteBundle\Entity\Website;
 
 /**
  * CrawlWebsiteConsumer.
  */
-class CrawlWebsiteConsumer extends ContainerAware implements ConsumerInterface
+class CrawlWebsiteConsumer implements ConsumerInterface
 {
+    use ContainerAwareTrait;
+
     protected $client;
 
     public function __construct()
     {
         $this->client = new Client([
             'timeout' => 2.0,
+            'defaults' => array(
+                'headers' => array(
+                    'DNT' => 1,
+                    'Cache-Control' => 'no-cache',
+                    'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36'
+                ),
+            ),
         ]);
         $this->client->setDefaultOption('verify', false);
     }
@@ -56,36 +66,55 @@ class CrawlWebsiteConsumer extends ContainerAware implements ConsumerInterface
      */
     public function execute(AMQPMessage $msg)
     {
-        // Initialize
         $website = new WebsiteMessage($msg->body);
-        echo "Crawling: " . $website->getUrl() . PHP_EOL;
+        $logger = $this->container->get('logger');
+        $logger->info("[website] Crawling: " . $website->getUrl() . "…");
 
         try {
+            $startTime = microtime(true);
             $res = $this->client->get($website->getUrl());
+            $endTime = microtime(true);
+
+            $website->setHttpCode($res->getStatusCode());
+            $website->setResponseTime($endTime - $startTime);
+
             if ($res->getStatusCode() == 200) {
-                $this->declareSuccess($website);
+                $website->setStatus(Website::STATUS_OK);
+                $website->setGenerator($this->getResponseGenerator($res));
+                $this->produceNotification($website);
                 return true;
             } else {
-                $this->declareBroken($website);
+                $website->setStatus(Website::STATUS_FAIL);
+                $website->setFailMessage($res->getReasonPhrase());
+                $this->produceNotification($website);
                 return true;
             }
         } catch (RequestException $e) {
-            $this->declareBroken($website);
+            $website->setStatus(Website::STATUS_FAIL);
+            $website->setFailMessage($e->getMessage());
+            $this->produceNotification($website);
             return true;
         }
     }
 
-    protected function declareSuccess(WebsiteMessage $website)
+    protected function produceNotification(WebsiteMessage $website)
     {
-        $website->setStatus(WebsiteMessage::STATUS_OK);
         $producer = $this->container->get('old_sound_rabbit_mq.notify_website_producer');
         return $producer->publish($website);
     }
 
-    protected function declareBroken(WebsiteMessage $website)
+    /**
+     * @param  [type] $res
+     * @return string|null
+     */
+    protected function getResponseGenerator($res)
     {
-        $website->setStatus(WebsiteMessage::STATUS_FAIL);
-        $producer = $this->container->get('old_sound_rabbit_mq.notify_website_producer');
-        return $producer->publish($website);
+        $body = $res->getBody();
+        $cmsVersion = array();
+        if (preg_match("/\<meta name\=\"generator\" content\=\"([^\"]+)\"/", (string) $body, $cmsVersion) > 0) {
+            return $cmsVersion[1];
+        }
+
+        return null;
     }
 }

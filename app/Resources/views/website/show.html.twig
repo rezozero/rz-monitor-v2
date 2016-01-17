@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Website</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ website.id }}</td>
+            </tr>
+            <tr>
+                <th>Url</th>
+                <td>{{ website.url }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ website.status }}</td>
+            </tr>
+            <tr>
+                <th>Generator</th>
+                <td>{{ website.generator }}</td>
+            </tr>
+            <tr>
+                <th>Avgresponsetime</th>
+                <td>{{ website.avgResponseTime }}</td>
+            </tr>
+            <tr>
+                <th>Lastresponsetime</th>
+                <td>{{ website.lastResponseTime }}</td>
+            </tr>
+            <tr>
+                <th>Httpcode</th>
+                <td>{{ website.httpCode }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ website.name }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('website_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('website_edit', { 'id': website.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

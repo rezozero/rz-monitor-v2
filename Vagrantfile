@@ -16,7 +16,7 @@ Vagrant.configure(2) do |config|
         vb.memory = "1024"
     end
 
-    config.vm.provision "roadiz",      type: :shell, path: "vagrant/vagrant-provisioning.sh"
+    config.vm.provision "lemp",        type: :shell, path: "vagrant/vagrant-provisioning.sh"
     config.vm.provision "phpmyadmin",  type: :shell, path: "vagrant/vagrant-phpmyadmin-provisioning.sh"
     config.vm.provision "mailcatcher", type: :shell, path: "vagrant/vagrant-mailcatcher-provisioning.sh"
 end

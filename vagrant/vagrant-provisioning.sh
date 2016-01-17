@@ -26,7 +26,7 @@ sudo debconf-set-selections <<< "mariadb-server-10.0 mysql-server/root_password_
 echo -e "\n--- Install base servers and packages ---\n"
 sudo apt-get -qq -f -y install git nginx mariadb-server mariadb-client sqlite php5-fpm curl rabbitmq-server > /dev/null 2>&1;
 echo -e "\n--- Install all php5 extensions ---\n"
-sudo apt-get -qq -f -y install php5-cli php5-mysqlnd php5-curl php5-gd php5-intl php5-imagick php5-imap php5-mcrypt php5-memcached php5-ming php5-ps php5-pspell php5-recode php5-sqlite php5-tidy php5-xmlrpc php5-xsl php5-xcache php5-xdebug php-amqplib > /dev/null 2>&1;
+sudo apt-get -qq -f -y install php5-cli php5-mysqlnd php5-curl php5-gd php5-intl php5-imagick php5-imap php5-mcrypt php5-memcached php5-ming php5-ps php5-pspell php5-recode php5-sqlite php5-tidy php5-xmlrpc php5-xsl php5-xcache php5-xdebug > /dev/null 2>&1;
 
 echo -e "\n--- Setting up our MySQL user and db ---\n"
 sudo mysql -uroot -p$DBPASSWD -e "CREATE DATABASE $DBNAME"

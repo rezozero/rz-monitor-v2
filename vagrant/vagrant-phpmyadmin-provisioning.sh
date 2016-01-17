@@ -16,7 +16,7 @@ sudo tar -xzvf ${TEMP_DIR}/${PHPMYADMIN_ARCHIVE}.tar.gz > /dev/null 2>&1;
 echo -e "\n--- Installing phpmyadmin... ---\n"
 sudo mv ${TEMP_DIR}/${PHPMYADMIN_ARCHIVE} ${PHPMYADMIN_DIR} > /dev/null 2>&1;
 
-echo -e "\n--- Configure phpmyadmin to connect automatically for stiefvater DB ---\n"
+echo -e "\n--- Configure phpmyadmin to connect automatically for rzmonitor2 DB ---\n"
 sudo touch ${PHPMYADMIN_DIR}/config.inc.php > /dev/null 2>&1;
 sudo cat >> ${PHPMYADMIN_DIR}/config.inc.php <<'EOF'
 <?php
@@ -38,8 +38,8 @@ $i = 0;
 $i++;
 /* Authentication type */
 $cfg['Servers'][$i]['auth_type'] = 'config';
-$cfg['Servers'][$i]['user'] = 'stiefvater';
-$cfg['Servers'][$i]['password'] = 'stiefvater';
+$cfg['Servers'][$i]['user'] = 'rzmonitor2';
+$cfg['Servers'][$i]['password'] = 'rzmonitor2';
 /* Server parameters */
 $cfg['Servers'][$i]['host'] = 'localhost';
 $cfg['Servers'][$i]['connect_type'] = 'tcp';
