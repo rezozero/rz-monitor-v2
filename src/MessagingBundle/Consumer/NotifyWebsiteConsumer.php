@@ -30,6 +30,7 @@ use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use WebsiteBundle\Entity\Website;
+use WebsiteBundle\Event\WebsiteEvent;
 
 /**
  * NotifyWebsiteConsumer.
@@ -37,6 +38,9 @@ use WebsiteBundle\Entity\Website;
 class NotifyWebsiteConsumer implements ConsumerInterface
 {
     use ContainerAwareTrait;
+
+    const RETRY_COUNT = 3;
+
     /**
      *  Main execute method
      *  Execute actions for a given message
@@ -56,14 +60,34 @@ class NotifyWebsiteConsumer implements ConsumerInterface
         if (null === $websiteEntity) {
             throw new \RuntimeException("Website does not exists in database.", 1);
         } else {
+            $websiteEntity->setLastResponseTime($message->getResponseTime());
+            $websiteEntity->setLastCrawl($message->getDatetime());
+            $websiteEntity->setHttpCode($message->getHttpCode());
+            $websiteEntity->setGenerator($message->getGenerator());
+
+            /*
+             * Handle status changes.
+             */
             if ($websiteEntity->getStatus() === $message->getStatus()) {
                 $websiteEntity->setCrawlCount($websiteEntity->getCrawlCount() + 1);
                 /*
                  * Need to be declared failed twice to be broken.
                  */
                 if ($message->getStatus() === Website::STATUS_FAIL &&
-                    $websiteEntity->getCrawlCount() > 2) {
+                    $websiteEntity->getCrawlCount() > static::RETRY_COUNT) {
                     $websiteEntity->setStatus(Website::STATUS_BROKEN);
+
+                    $this->container->get("event_dispatcher")->dispatch(
+                        WebsiteEvent::DECLARED_BROKEN,
+                        new WebsiteEvent($websiteEntity)
+                    );
+                } elseif ($message->getStatus() === Website::STATUS_FAIL) {
+                    $websiteEntity->setStatus($message->getStatus());
+
+                    $this->container->get("event_dispatcher")->dispatch(
+                        WebsiteEvent::HAS_FAILED,
+                        new WebsiteEvent($websiteEntity)
+                    );
                 } else {
                     $websiteEntity->setStatus($message->getStatus());
                 }
@@ -79,16 +103,26 @@ class NotifyWebsiteConsumer implements ConsumerInterface
                     /*
                      * Reset crawl count when status changes.
                      */
+                    if ($websiteEntity->getStatus() === Website::STATUS_BROKEN &&
+                        $message->getStatus() === Website::STATUS_OK) {
+                        $this->container->get("event_dispatcher")->dispatch(
+                            WebsiteEvent::BACK_TO_NORMAL,
+                            new WebsiteEvent($websiteEntity)
+                        );
+                    }
+                    if ($websiteEntity->getStatus() === Website::STATUS_OK &&
+                        $message->getStatus() === Website::STATUS_FAIL) {
+                        $this->container->get("event_dispatcher")->dispatch(
+                            WebsiteEvent::HAS_FAILED,
+                            new WebsiteEvent($websiteEntity)
+                        );
+                    }
+
                     $websiteEntity->setStatus($message->getStatus());
                     $websiteEntity->setCrawlCount(1);
                     $websiteEntity->setAvgResponseTime(0);
                 }
             }
-
-            $websiteEntity->setLastResponseTime($message->getResponseTime());
-            $websiteEntity->setLastCrawl(new \Datetime('now'));
-            $websiteEntity->setHttpCode($message->getHttpCode());
-            $websiteEntity->setGenerator($message->getGenerator());
 
             $em->flush();
         }

@@ -17,7 +17,6 @@
             <tr>
                 <th>Name</th>
                 <th>Url</th>
-                <th>Status</th>
                 <th>Generator</th>
                 <th>Avg response time</th>
                 <th>Last response time</th>
@@ -40,7 +39,6 @@
             <tr class="{{ rowClasses|join(' ') }}">
                 <td>{{ website.name }}</td>
                 <td><a href="{{ path('website_show', { 'id': website.id }) }}">{{ website.url }}</a></td>
-                <td>{{ website.humanStatus }}</td>
                 <td>{{ website.generator }}</td>
                 <td>{{ website.avgResponseTime }}</td>
                 <td>{{ website.lastResponseTime|number_format(3) }} sec</td>

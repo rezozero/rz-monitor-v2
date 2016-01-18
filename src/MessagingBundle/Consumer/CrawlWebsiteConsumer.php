@@ -45,7 +45,7 @@ class CrawlWebsiteConsumer implements ConsumerInterface
     public function __construct()
     {
         $this->client = new Client([
-            'timeout' => 2.0,
+            'timeout' => 3.0,
             'defaults' => array(
                 'headers' => array(
                     'DNT' => 1,
@@ -68,7 +68,7 @@ class CrawlWebsiteConsumer implements ConsumerInterface
     {
         $website = new WebsiteMessage($msg->body);
         $logger = $this->container->get('logger');
-        $logger->info("[website] Crawling: " . $website->getUrl() . "…");
+        $logger->debug("[website] Crawling: " . $website->getUrl() . "…");
 
         try {
             $startTime = microtime(true);
@@ -77,6 +77,7 @@ class CrawlWebsiteConsumer implements ConsumerInterface
 
             $website->setHttpCode($res->getStatusCode());
             $website->setResponseTime($endTime - $startTime);
+            $website->setDatetime(new \Datetime('now'));
 
             if ($res->getStatusCode() == 200) {
                 $website->setStatus(Website::STATUS_OK);

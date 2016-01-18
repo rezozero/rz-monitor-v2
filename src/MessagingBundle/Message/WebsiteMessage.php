@@ -40,6 +40,7 @@ class WebsiteMessage
     protected $responseTime;
     protected $httpCode;
     protected $failMessage;
+    protected $datetime;
 
     /**
      * @param string $json
@@ -57,6 +58,8 @@ class WebsiteMessage
                 }
             }
         }
+
+        $this->datetime = new \Datetime('now');
     }
 
     /**
@@ -257,6 +260,30 @@ class WebsiteMessage
     public function setFailMessage($failMessage)
     {
         $this->failMessage = $failMessage;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of datetime.
+     *
+     * @return \Datetime
+     */
+    public function getDatetime()
+    {
+        return $this->datetime;
+    }
+
+    /**
+     * Sets the value of datetime.
+     *
+     * @param \Datetime $datetime the datetime
+     *
+     * @return self
+     */
+    public function setDatetime(\Datetime $datetime)
+    {
+        $this->datetime = $datetime;
 
         return $this;
     }

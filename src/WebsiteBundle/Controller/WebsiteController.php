@@ -142,7 +142,7 @@ class WebsiteController extends Controller
     /**
      * Crawls all Website entities.
      *
-     * @Route("/crawl-all", name="website_crawl_all")
+     * @Route("/crawl/all", name="website_crawl_all")
      * @Method("GET")
      */
     public function crawlAllAction()

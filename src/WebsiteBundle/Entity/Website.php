@@ -288,7 +288,7 @@ class Website
     /**
      * Gets the value of lastCrawl.
      *
-     * @return string
+     * @return \Datetime
      */
     public function getLastCrawl()
     {
@@ -298,11 +298,11 @@ class Website
     /**
      * Sets the value of lastCrawl.
      *
-     * @param string $lastCrawl the last crawl
+     * @param \Datetime $lastCrawl the last crawl
      *
      * @return self
      */
-    public function setLastCrawl($lastCrawl)
+    public function setLastCrawl(\Datetime $lastCrawl)
     {
         $this->lastCrawl = $lastCrawl;
 
