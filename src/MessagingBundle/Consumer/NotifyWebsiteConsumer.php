@@ -51,15 +51,14 @@ class NotifyWebsiteConsumer implements ConsumerInterface
      */
     public function execute(AMQPMessage $msg)
     {
-        $logger = $this->container->get('logger');
         $em = $this->container->get('doctrine')->getManager();
+        $logger = $this->container->get('logger');
+
         $message = new WebsiteMessage($msg->body);
         $websiteEntity = $em->getRepository('WebsiteBundle\Entity\Website')
-            ->findOneWithMessage($message);
+                            ->findOneWithMessage($message);
 
-        if (null === $websiteEntity) {
-            throw new \RuntimeException("Website does not exists in database.", 1);
-        } else {
+        if (null !== $websiteEntity) {
             $websiteEntity->setLastResponseTime($message->getResponseTime());
             $websiteEntity->setLastCrawl($message->getDatetime());
             $websiteEntity->setHttpCode($message->getHttpCode());
@@ -125,12 +124,12 @@ class NotifyWebsiteConsumer implements ConsumerInterface
             }
 
             $em->flush();
-        }
 
-        if ($message->isUp()) {
-            $logger->info("[website] " . $message->getUrl() . " is up.");
-        } else {
-            $logger->info("[website] " . $message->getUrl() . " (" . $message->getFailMessage() . ") is down.");
+            if ($message->isUp()) {
+                $logger->info("[website] " . $message->getUrl() . " is up.");
+            } else {
+                $logger->info("[website] " . $message->getUrl() . " (" . $message->getFailMessage() . ") is down.");
+            }
         }
 
         return true;

@@ -11,3 +11,9 @@ services:
             - { name: kernel.event_subscriber }
         calls:
             - [ setContainer, [ "@service_container" ] ]
+    app.command.crawl_all_command:
+        class: WebsiteBundle\Command\CrawlAllCommand
+        tags:
+            -  { name: console.command }
+        calls:
+            - [ setContainer, [ "@service_container" ] ]
