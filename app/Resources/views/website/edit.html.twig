@@ -1,21 +1,28 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Website edit</h1>
+    <h1>Edit website</h1>
     {% form_theme edit_form 'bootstrap_3_layout.html.twig' %}
-    {{ form_start(edit_form) }}
-        {{ form_widget(edit_form) }}
-        <input type="submit" value="Edit" />
-    {{ form_end(edit_form) }}
 
-    <ul>
-        <li>
-            <a href="{{ path('website_index') }}">Back to the list</a>
-        </li>
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="Delete">
-            {{ form_end(delete_form) }}
-        </li>
-    </ul>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {{ form_start(edit_form) }}
+                {{ form_widget(edit_form) }}
+                <button class="btn btn-primary" type="submit" value="Edit">Edit</button>
+            {{ form_end(edit_form) }}
+        </div>
+    </div>
+
+    <nav class="navbar navbar-default iten-nav">
+        <ul class="nav navbar-nav">
+            <li>
+                <a href="{{ path('website_index') }}">Back to the list</a>
+            </li>
+            <li class="navbar-form navbar-right">
+                {{ form_start(delete_form) }}
+                <button class="btn btn-danger" type="submit" value="Delete">Delete</button>
+                {{ form_end(delete_form) }}
+            </li>
+        </ul>
+    </nav>
 {% endblock %}

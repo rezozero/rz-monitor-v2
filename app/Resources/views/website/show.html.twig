@@ -37,20 +37,31 @@
                 <th>Name</th>
                 <td>{{ website.name }}</td>
             </tr>
+            <tr>
+                <th>lastCrawl</th>
+                <td>{{ website.lastCrawl|localizeddate('medium', 'medium') }}</td>
+            </tr>
+            <tr>
+                <th>crawlCount</th>
+                <td>{{ website.crawlCount }}</td>
+            </tr>
         </tbody>
     </table>
 
-    <ul>
-        <li>
-            <a href="{{ path('website_index') }}">Back to the list</a>
-        </li>
-        <li>
-            <a href="{{ path('website_edit', { 'id': website.id }) }}">Edit</a>
-        </li>
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="Delete">
-            {{ form_end(delete_form) }}
-        </li>
-    </ul>
+
+    <nav class="navbar navbar-default iten-nav">
+        <ul class="nav navbar-nav">
+            <li>
+                <a href="{{ path('website_index') }}">Back to the list</a>
+            </li>
+            <li>
+                <a href="{{ path('website_edit', { 'id': website.id }) }}">Edit</a>
+            </li>
+            <li class="navbar-form navbar-right">
+                {{ form_start(delete_form) }}
+                <button class="btn btn-danger" type="submit" value="Delete">Delete</button>
+                {{ form_end(delete_form) }}
+            </li>
+        </ul>
+    </nav>
 {% endblock %}

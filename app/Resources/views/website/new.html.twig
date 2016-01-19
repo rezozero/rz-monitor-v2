@@ -3,14 +3,22 @@
 {% block body %}
     <h1>Website creation</h1>
     {% form_theme form 'bootstrap_3_layout.html.twig' %}
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <input type="submit" value="Create" />
-    {{ form_end(form) }}
 
-    <ul>
-        <li>
-            <a href="{{ path('website_index') }}">Back to the list</a>
-        </li>
-    </ul>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <button type="submit" class="btn btn-primary" value="Create">Create</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    <nav class="navbar navbar-default iten-nav">
+        <ul class="nav navbar-nav">
+            <li>
+                <a href="{{ path('website_index') }}">Back to the list</a>
+            </li>
+        </ul>
+    </nav>
 {% endblock %}

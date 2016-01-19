@@ -1,27 +1,27 @@
 {% extends 'base.html.twig' %}
 
+{% block nav %}
+<nav class="navbar navbar-default">
+    <div class="navbar-header">
+        <a class="navbar-brand" href="/">RZMonitor</a>
+    </div>
+    <ul class="nav navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="{{ path('website_new') }}">Add a new website</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('website_crawl_all') }}">Crawl all websites</a></li>
+    </ul>
+</nav>
+{% endblock %}
 {% block body %}
-    <nav class="navbar navbar-default">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">RZMonitor</a>
-        </div>
-        <ul class="nav navbar-nav">
-            <li class="nav-item"><a class="nav-link" href="{{ path('website_new') }}">Add a new website</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ path('website_crawl_all') }}">Crawl all websites</a></li>
-        </ul>
-    </nav>
-    <h1>Website list</h1>
+    <h1>Websites list</h1>
 
     <table class="table">
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Url</th>
+                <th class="hidden-sm hidden-xs">Url</th>
                 <th>Generator</th>
-                <th>Avg response time</th>
-                <th>Last response time</th>
-                <th>Http code</th>
-                {# <th>Crawl count</th> #}
+                <th>Latency</th>
+                <th class="hidden-sm hidden-xs">Code</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -30,6 +30,9 @@
             {% set rowClasses = [
                 website.humanStatus|replace({'.': '-'})
             ] %}
+            {% if website.status == 0 %}
+            {% set rowClasses = rowClasses|merge(['info']) %}
+            {% endif %}
             {% if website.status == 20 %}
             {% set rowClasses = rowClasses|merge(['warning']) %}
             {% endif %}
@@ -38,24 +41,16 @@
             {% endif %}
             <tr class="{{ rowClasses|join(' ') }}">
                 <td>{{ website.name }}</td>
-                <td><a href="{{ path('website_show', { 'id': website.id }) }}">{{ website.url }}</a></td>
+                <td class="hidden-sm hidden-xs"><a href="{{ path('website_show', { 'id': website.id }) }}">{{ website.url }}</a></td>
                 <td>{{ website.generator }}</td>
-                <td>{{ website.avgResponseTime }}</td>
                 <td>{{ website.lastResponseTime|number_format(3) }} sec</td>
-                <td>{{ website.httpCode }}</td>
-                {# <td>{{ website.crawlCount }}</td> #}
+                <td class="hidden-sm hidden-xs">{{ website.httpCode }}</td>
                 <td>
-                    <ul>
-                        <li>
-                            <a href="{{ path('website_show', { 'id': website.id }) }}">show</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('website_edit', { 'id': website.id }) }}">edit</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('website_crawl', { 'id': website.id }) }}">crawl</a>
-                        </li>
-                    </ul>
+                    <div class="btn-group btn-group-xs" role="group">
+                        <a class="btn btn-default" href="{{ path('website_show', { 'id': website.id }) }}">Show</a>
+                        <a class="btn btn-default" href="{{ path('website_edit', { 'id': website.id }) }}">Edit</a>
+                        <a class="btn btn-primary" href="{{ path('website_crawl', { 'id': website.id }) }}">Crawl</a>
+                    </div>
                 </td>
             </tr>
         {% endfor %}

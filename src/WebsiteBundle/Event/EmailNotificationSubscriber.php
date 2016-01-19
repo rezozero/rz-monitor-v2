@@ -52,7 +52,7 @@ class EmailNotificationSubscriber implements EventSubscriberInterface
         $logger->info("[email] Email sent about website (" . $website->getUrl() . ") declared broken.");
 
         $assignation = array(
-            'emailTitle' => '[Website down] ' . $website->getUrl() . 'seems to be broken.',
+            'emailTitle' => '[Website down] ' . $website->getUrl() . ' seems to be broken.',
             'description' => $website->getName() . ' website has been declared broken on '.$website->getLastCrawl()->format('Y/m/d H:i:s e').' after trying ' . NotifyWebsiteConsumer::RETRY_COUNT . ' times.',
         );
 

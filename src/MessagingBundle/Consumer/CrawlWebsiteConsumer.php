@@ -45,8 +45,9 @@ class CrawlWebsiteConsumer implements ConsumerInterface
     public function __construct()
     {
         $this->client = new Client([
-            'timeout' => 3.0,
             'defaults' => array(
+                'connect_timeout' => 3,
+                'timeout' => 5,
                 'headers' => array(
                     'DNT' => 1,
                     'Cache-Control' => 'no-cache',

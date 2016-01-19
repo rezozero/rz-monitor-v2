@@ -53,7 +53,8 @@ class WebsiteController extends Controller
             $em->persist($website);
             $em->flush();
 
-            return $this->redirectToRoute('website_show', array('id' => $website->getId()));
+            return $this->redirectToRoute('website_index');
+            //return $this->redirectToRoute('website_show', array('id' => $website->getId()));
         }
 
         return $this->render('website/new.html.twig', array(
