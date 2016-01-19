@@ -78,18 +78,23 @@ class EmailNotificationSubscriber implements EventSubscriberInterface
 
     protected function sendEmail(array $assignation, $content)
     {
-        $mailer = $this->container->get('mailer');
+        try {
+            $mailer = $this->container->get('mailer');
 
-        $email = \Swift_Message::newInstance()
-            ->setSubject($assignation['emailTitle'])
-            ->setFrom($this->container->getParameter('mailer_from'))
-            ->setTo($this->container->getParameter('mailer_to'))
-            ->setBody($content, 'text/html')
-            ->addPart(
-                $assignation['description'],
-                'text/plain'
-            )
-        ;
-        $mailer->send($email);
+            $email = \Swift_Message::newInstance()
+                ->setSubject($assignation['emailTitle'])
+                ->setFrom($this->container->getParameter('mailer_from'))
+                ->setTo($this->container->getParameter('mailer_to'))
+                ->setBody($content, 'text/html')
+                ->addPart(
+                    $assignation['description'],
+                    'text/plain'
+                )
+            ;
+            $mailer->send($email);
+        } catch (\Swift_SwiftException $e) {
+            $logger = $this->container->get('logger');
+            $logger->error("[email] Cannot send email about website (" . $website->getUrl() . ") back to normal. " . $e->getMessage());
+        }
     }
 }
