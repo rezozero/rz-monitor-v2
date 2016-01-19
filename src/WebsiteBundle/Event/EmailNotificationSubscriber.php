@@ -53,7 +53,7 @@ class EmailNotificationSubscriber implements EventSubscriberInterface
 
         $assignation = array(
             'emailTitle' => '[Website down] ' . $website->getUrl() . ' seems to be broken.',
-            'description' => $website->getName() . ' website has been declared broken on '.$website->getLastCrawl()->format('Y/m/d H:i:s e').' after trying ' . NotifyWebsiteConsumer::RETRY_COUNT . ' times.',
+            'description' => $website->getName() . ' website has been declared broken on ' . $website->getLastCrawl()->format('Y/m/d H:i:s e') . ' after trying ' . NotifyWebsiteConsumer::RETRY_COUNT . ' times.',
         );
 
         $this->sendEmail($assignation, $templating->render('email/alert.html.twig', $assignation));
@@ -70,7 +70,7 @@ class EmailNotificationSubscriber implements EventSubscriberInterface
 
         $assignation = array(
             'emailTitle' => '[Website up] ' . $website->getUrl() . ' is back to normal.',
-            'description' => $website->getName() . ' website is now back to normal since '.$website->getLastCrawl()->format('Y/m/d H:i:s e').'.',
+            'description' => $website->getName() . ' website is now back to normal since ' . $website->getLastCrawl()->format('Y/m/d H:i:s e') . '.',
         );
 
         $this->sendEmail($assignation, $templating->render('email/alert.html.twig', $assignation));
