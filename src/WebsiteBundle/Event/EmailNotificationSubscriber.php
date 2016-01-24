@@ -94,7 +94,7 @@ class EmailNotificationSubscriber implements EventSubscriberInterface
             $mailer->send($email);
         } catch (\Swift_SwiftException $e) {
             $logger = $this->container->get('logger');
-            $logger->error("[email] Cannot send email about website (" . $website->getUrl() . ") back to normal. " . $e->getMessage());
+            $logger->error("[email] Cannot send email about website back to normal. " . $e->getMessage());
         }
     }
 }
